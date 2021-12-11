@@ -1,0 +1,15 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/expected
+expected.so
+expected.dylib
+expected.dll
+expected.a
+expected.lib
+expected-test-*
+*.exe
+*.o
+*.obj
+*.lst
