@@ -1,6 +1,4 @@
 # expected
-a `@safe`, `@nogc` compatible error type.
+an alternative to exceptions, compatible with `@nogc` and `@safe` code.
 
-(c) hybrid development team 2021. licenced under the AGPL-3.0 or later.
-
-as it turns out, this is made entirely redundant by `out` parameters and/or `@nodiscard`, so you should probably use those instead!
+(c) hybrid development team 2021 - 2022. licenced under the AGPL-3.0 or later.
