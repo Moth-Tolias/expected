@@ -11,15 +11,15 @@ module expected;
 /// tagged union containing result or error. indicates failure by default
 struct Expected(ResultType, FailureModeType)
 {
-    /// tag enum.
-    enum Tag
-    {
-        Success,
-        Failure
-    }
+	/// tag enum.
+	enum Tag
+	{
+		Success,
+		Failure
+	}
 
-    private Tag _tag = Tag.Failure;
-    private ResultAndFailureMode!(ResultType, FailureModeType) contents;
+	private Tag _tag = Tag.Failure;
+	private ResultAndFailureMode!(ResultType, FailureModeType) contents;
 
 	/// constructor
 	this(in ResultType rhs) const @nogc nothrow pure @safe
@@ -35,62 +35,62 @@ struct Expected(ResultType, FailureModeType)
 		contents.failureMode = rhs;
 	}
 
-    /// tag state. readonly
-    @property Tag tag() const @nogc nothrow pure @safe
-    {
-        return _tag;
-    }
+	/// tag state. readonly
+	@property Tag tag() const @nogc nothrow pure @safe
+	{
+		return _tag;
+	}
 
-    /// result //trusted because tagged unions aren't builtin
-    @property const(ResultType) result() const @nogc nothrow pure @trusted
-    in (tag == Tag.Success)
-    {
-        return contents.result;
-    }
+	/// result //trusted because tagged unions aren't builtin
+	@property const(ResultType) result() const @nogc nothrow pure @trusted
+	in (tag == Tag.Success)
+	{
+		return contents.result;
+	}
 
-    /// ditto
-    @property void result(ResultType result) @nogc nothrow pure @trusted
-    out (; tag == Tag.Success)
-    {
-        _tag = Tag.Success;
-        contents.result = result;
-    }
+	/// ditto
+	@property void result(ResultType result) @nogc nothrow pure @trusted
+	out (; tag == Tag.Success)
+	{
+		_tag = Tag.Success;
+		contents.result = result;
+	}
 
-    /// failure mode
-    @property FailureModeType failureMode() const @nogc nothrow pure @trusted
-    in (tag == Tag.Failure)
-    {
-        return contents.failureMode;
-    }
+	/// failure mode
+	@property FailureModeType failureMode() const @nogc nothrow pure @trusted
+	in (tag == Tag.Failure)
+	{
+		return contents.failureMode;
+	}
 
-    /// ditto
-    @property void failureMode(in FailureModeType failureMode) @nogc nothrow pure @trusted
-    out (; tag == Tag.Failure)
-    {
-        _tag = Tag.Failure;
-        contents.failureMode = failureMode;
-    }
+	/// ditto
+	@property void failureMode(in FailureModeType failureMode) @nogc nothrow pure @trusted
+	out (; tag == Tag.Failure)
+	{
+		_tag = Tag.Failure;
+		contents.failureMode = failureMode;
+	}
 }
 
 private union ResultAndFailureMode(ResultType, FailureModeType)
 {
-    ResultType result;
-    FailureModeType failureMode;
+	ResultType result;
+	FailureModeType failureMode;
 }
 
 @nogc nothrow pure @safe unittest
 {
-    enum FailureMode
-    {
-        Error1,
-        Error2
-    }
+	enum FailureMode
+	{
+		Error1,
+		Error2
+	}
 
-    Expected!(int, FailureMode) foo = 5;
+	Expected!(int, FailureMode) foo = 5;
 	assert(foo.tag == foo.Tag.Success);
 	assert(foo.result == 5);
 
-    foo.failureMode = FailureMode.Error2;
+	foo.failureMode = FailureMode.Error2;
 	assert(foo.tag == foo.Tag.Failure);
 	assert(foo.failureMode == FailureMode.Error2);
 
@@ -105,7 +105,7 @@ private union ResultAndFailureMode(ResultType, FailureModeType)
 	assert(bar.tag == bar.Tag.Success);
 	assert(bar.result.field == 5);
 
-    bar.failureMode = FailureMode.Error2;
+	bar.failureMode = FailureMode.Error2;
 	assert(bar.tag == bar.Tag.Failure);
 
 	Expected!(S, FailureMode) baz = FailureMode.Error1;
