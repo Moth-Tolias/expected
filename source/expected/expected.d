@@ -10,6 +10,7 @@ module expected;
 
 /// tagged union containing result or error. indicates failure by default
 struct Expected(ResultType, FailureType)
+if(is(FailureType == enum))
 {
 	/// tag enum.
 	enum Tag
