@@ -9,7 +9,7 @@
 module expected;
 
 /// tagged union containing result or error. indicates failure by default
-struct Expected(ResultType, FailureModeType)
+struct Expected(ResultType, FailureType)
 {
 	/// tag enum.
 	enum Tag
@@ -19,7 +19,13 @@ struct Expected(ResultType, FailureModeType)
 	}
 
 	private Tag _tag = Tag.Failure;
-	private ResultAndFailureMode!(ResultType, FailureModeType) contents;
+	private ResultAndFailure contents;
+
+	private union ResultAndFailure
+	{
+		ResultType result;
+		FailureType failure;
+	}
 
 	/// constructor
 	this(in ResultType rhs) const @nogc nothrow pure @safe
@@ -29,13 +35,13 @@ struct Expected(ResultType, FailureModeType)
 	}
 
 	/// ditto
-	this(in FailureModeType rhs) const @nogc nothrow pure @safe
+	this(in FailureType rhs) const @nogc nothrow pure @safe
 	{
 		_tag = Tag.Failure;
-		contents.failureMode = rhs;
+		contents.failure = rhs;
 	}
 
-	/// tag state. readonly
+	/// tag state.
 	@property Tag tag() const @nogc nothrow pure @safe
 	{
 		return _tag;
@@ -57,42 +63,37 @@ struct Expected(ResultType, FailureModeType)
 	}
 
 	/// failure mode
-	@property FailureModeType failureMode() const @nogc nothrow pure @trusted
+	@property FailureType failure() const @nogc nothrow pure @trusted
 	in (tag == Tag.Failure)
 	{
-		return contents.failureMode;
+		return contents.failure;
 	}
 
 	/// ditto
-	@property void failureMode(in FailureModeType failureMode) @nogc nothrow pure @trusted
+	@property void failure(in FailureType failure) @nogc nothrow pure @trusted
 	out (; tag == Tag.Failure)
 	{
 		_tag = Tag.Failure;
-		contents.failureMode = failureMode;
+		contents.failure = failure;
 	}
 }
 
-private union ResultAndFailureMode(ResultType, FailureModeType)
-{
-	ResultType result;
-	FailureModeType failureMode;
-}
-
+///
 @nogc nothrow pure @safe unittest
 {
-	enum FailureMode
+	enum Failure
 	{
 		Error1,
 		Error2
 	}
 
-	Expected!(int, FailureMode) foo = 5;
+	Expected!(int, Failure) foo = 5;
 	assert(foo.tag == foo.Tag.Success);
 	assert(foo.result == 5);
 
-	foo.failureMode = FailureMode.Error2;
+	foo.failure = Failure.Error2;
 	assert(foo.tag == foo.Tag.Failure);
-	assert(foo.failureMode == FailureMode.Error2);
+	assert(foo.failure == Failure.Error2);
 
 	struct S
 	{
@@ -100,14 +101,14 @@ private union ResultAndFailureMode(ResultType, FailureModeType)
 		int field;
 	}
 
-	Expected!(S, FailureMode) bar;
+	Expected!(S, Failure) bar;
 	bar.result = S(5); //workaround for property shenanigans
 	assert(bar.tag == bar.Tag.Success);
 	assert(bar.result.field == 5);
 
-	bar.failureMode = FailureMode.Error2;
+	bar.failure = Failure.Error2;
 	assert(bar.tag == bar.Tag.Failure);
 
-	Expected!(S, FailureMode) baz = FailureMode.Error1;
-	assert(baz.failureMode == FailureMode.Error1);
+	immutable Expected!(S, Failure) baz = Failure.Error1;
+	assert(baz.failure == Failure.Error1);
 }
