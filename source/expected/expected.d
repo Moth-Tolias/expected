@@ -1,15 +1,12 @@
-module expected;
-
 /**
 * a @safe, @nogc-compatible template error type.
-*
-* you should probably use out parameters instead of this.
 *
 * Authors: Susan
 * Date: 2021-12-10
 * Licence: AGPL-3.0 or later
 * Copyright: Hybrid Development Team, 2021
 */
+module expected;
 
 /// tagged union containing result or error. indicates failure by default
 struct Expected(ResultType, FailureModeType)
