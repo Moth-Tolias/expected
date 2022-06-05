@@ -2,8 +2,14 @@
 	"authors": [
 		"Susan"
 	],
-	"copyright": "Copyright © 2021, Hybrid Development Team",
-	"description": "A @safe, @nogc-compatible template error type.",
+	"copyright": "Copyright © 2021 - 2022, Hybrid Development Team",
+	"description": "An alternative to exceptions, compatible with @nogc and @safe code.",
 	"license": "AGPL-3.0 or later",
-	"name": "expected"
+	"name": "expected",
+	"buildTypes": {
+		"unittest-dip1000": {
+			"buildOptions": ["unittests", "debugMode", "debugInfo"],
+			"dflags": ["-preview=dip1000", "-preview=in"]
+		}
+	}
 }
