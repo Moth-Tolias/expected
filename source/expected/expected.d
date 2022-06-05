@@ -1,5 +1,5 @@
 /**
-* a @safe, @nogc-compatible template error type.
+* a template error type, compatible with @safe and @nogc.
 *
 * Authors: Susan
 * Date: 2021-12-10
@@ -22,49 +22,49 @@ struct Expected(ResultType, FailureModeType)
     private ResultAndFailureMode!(ResultType, FailureModeType) contents;
 
 	/// constructor
-	this(in ResultType rhs) @safe @nogc nothrow const pure
+	this(in ResultType rhs) const @nogc nothrow pure @safe
 	{
 		_tag = Tag.Success;
 		contents.result = rhs;
 	}
 
-	///ditto
-	this(in FailureModeType rhs) @safe @nogc nothrow const pure
+	/// ditto
+	this(in FailureModeType rhs) const @nogc nothrow pure @safe
 	{
 		_tag = Tag.Failure;
 		contents.failureMode = rhs;
 	}
 
     /// tag state. readonly
-    @property Tag tag() @safe @nogc nothrow const pure
+    @property Tag tag() const @nogc nothrow pure @safe
     {
         return _tag;
     }
 
-    ///result property //trusted because tagged unions aren't builtin
-    @property const(ResultType) result() @trusted @nogc nothrow const pure
+    /// result //trusted because tagged unions aren't builtin
+    @property const(ResultType) result() const @nogc nothrow pure @trusted
     in (tag == Tag.Success)
     {
         return contents.result;
     }
 
-    ///ditto
-    @property void result(ResultType result) @trusted @nogc nothrow pure
+    /// ditto
+    @property void result(ResultType result) @nogc nothrow pure @trusted
     out (; tag == Tag.Success)
     {
         _tag = Tag.Success;
         contents.result = result;
     }
 
-    ///failure mode property
-    @property FailureModeType failureMode() @safe @nogc nothrow const pure
+    /// failure mode
+    @property FailureModeType failureMode() const @nogc nothrow pure @trusted
     in (tag == Tag.Failure)
     {
         return contents.failureMode;
     }
 
-    ///ditto
-    @property void failureMode(in FailureModeType failureMode) @safe @nogc nothrow pure
+    /// ditto
+    @property void failureMode(in FailureModeType failureMode) @nogc nothrow pure @trusted
     out (; tag == Tag.Failure)
     {
         _tag = Tag.Failure;
@@ -78,7 +78,7 @@ private union ResultAndFailureMode(ResultType, FailureModeType)
     FailureModeType failureMode;
 }
 
-@safe @nogc nothrow pure unittest
+@nogc nothrow pure @safe unittest
 {
     enum FailureMode
     {
