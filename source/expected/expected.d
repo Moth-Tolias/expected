@@ -117,4 +117,16 @@ if(is(FailureType == enum))
 
 	immutable Expected!(S, Failure) baz = Failure.Error1;
 	assert(baz.failure == Failure.Error1);
+
+	//and with classes!
+	class C
+	{
+		S field;
+	}
+
+	scope c = new C;
+	c.field = S(420);
+	Expected!(C, Failure) sus;
+	sus.result = c;
+	assert(sus.result.field == S(420));
 }
