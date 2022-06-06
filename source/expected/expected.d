@@ -100,10 +100,15 @@ if(is(FailureType == enum))
 	{
 		invariant(field != 69);
 		int field;
+		void test() const @nogc nothrow pure @safe
+		{
+			//to ensure the invariant is run
+		}
 	}
 
 	Expected!(S, Failure) bar;
 	bar.result = S(5); //workaround for property shenanigans
+	bar.result.test();
 	assert(bar.tag == bar.Tag.Success);
 	assert(bar.result.field == 5);
 
