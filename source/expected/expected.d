@@ -29,14 +29,14 @@ if(is(FailureType == enum))
 	}
 
 	/// constructor
-	this(in ResultType rhs) const @nogc nothrow pure @safe
+	this(ResultType rhs) const
 	{
 		_tag = Tag.Success;
 		contents.result = rhs;
 	}
 
 	/// ditto
-	this(in FailureType rhs) const @nogc nothrow pure @safe
+	this(in FailureType rhs) const
 	{
 		_tag = Tag.Failure;
 		contents.failure = rhs;
@@ -49,14 +49,14 @@ if(is(FailureType == enum))
 	}
 
 	/// result //trusted because tagged unions aren't builtin
-	@property const(ResultType) result() const @nogc nothrow pure @trusted
+	@property inout(ResultType) result() inout @trusted
 	in (tag == Tag.Success)
 	{
 		return contents.result;
 	}
 
 	/// ditto
-	@property void result(ResultType result) @nogc nothrow pure @trusted
+	@property void result(ResultType result) @trusted
 	out (; tag == Tag.Success)
 	{
 		_tag = Tag.Success;
@@ -64,14 +64,14 @@ if(is(FailureType == enum))
 	}
 
 	/// failure mode
-	@property FailureType failure() const @nogc nothrow pure @trusted
+	@property FailureType failure() const @trusted
 	in (tag == Tag.Failure)
 	{
 		return contents.failure;
 	}
 
 	/// ditto
-	@property void failure(in FailureType failure) @nogc nothrow pure @trusted
+	@property void failure(in FailureType failure) @trusted
 	out (; tag == Tag.Failure)
 	{
 		_tag = Tag.Failure;
@@ -107,7 +107,7 @@ if(is(FailureType == enum))
 	}
 
 	Expected!(S, Failure) bar;
-	bar.result = S(5); //workaround for property shenanigans
+	bar.result = S(5);
 	bar.result.test();
 	assert(bar.tag == bar.Tag.Success);
 	assert(bar.result.field == 5);
