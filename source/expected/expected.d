@@ -8,6 +8,9 @@
 */
 module expected;
 
+///
+alias Expected(FailureType) = Expected!(void, FailureType);
+
 /// tagged union containing result or error. indicates failure by default
 struct Expected(ResultType, FailureType)
 if(is(FailureType == enum))
@@ -24,15 +27,21 @@ if(is(FailureType == enum))
 
 	private union ResultAndFailure
 	{
-		ResultType result;
 		FailureType failure;
+		static if(!is(ResultType == void))
+		{
+			ResultType result;
+		}
 	}
 
-	/// constructor
-	this(ResultType rhs) const
+	static if(!is(ResultType == void))
 	{
-		_tag = Tag.Success;
-		contents.result = rhs;
+		///
+		this(ResultType rhs) const
+		{
+			_tag = Tag.Success;
+			contents.result = rhs;
+		}
 	}
 
 	/// ditto
@@ -42,25 +51,49 @@ if(is(FailureType == enum))
 		contents.failure = rhs;
 	}
 
+	static if(!is(ResultType == bool))
+	{
+		///ditto
+		this(in bool successful) const
+		{
+			if(successful)
+			{
+				_tag = Tag.Success;
+				static if(!is(ResultType == void))
+				{
+					contents.result = ResultType.init;
+				}
+			}
+			else
+			{
+				_tag = Tag.Failure;
+				contents.failure = FailureType.init;
+			}
+		}
+	}
+
 	/// tag state.
 	@property Tag tag() const @nogc nothrow pure @safe
 	{
 		return _tag;
 	}
 
-	/// result //trusted because tagged unions aren't builtin
-	@property inout(ResultType) result() inout @trusted
-	in (tag == Tag.Success)
+	static if(!is(ResultType == void))
 	{
-		return contents.result;
-	}
+		/// result //trusted because tagged unions aren't builtin
+		@property inout(ResultType) result() inout @trusted
+		in (tag == Tag.Success)
+		{
+			return contents.result;
+		}
 
-	/// ditto
-	@property void result(ResultType result) @trusted
-	out (; tag == Tag.Success)
-	{
-		_tag = Tag.Success;
-		contents.result = result;
+		/// ditto
+		@property void result(ResultType result) @trusted
+		out (; tag == Tag.Success)
+		{
+			_tag = Tag.Success;
+			contents.result = result;
+		}
 	}
 
 	/// failure mode
@@ -106,7 +139,10 @@ if(is(FailureType == enum))
 		}
 	}
 
-	Expected!(S, Failure) bar;
+	auto bar = Expected!(S, Failure)(true);
+	assert(bar.tag == bar.Tag.Success);
+	assert(bar.result == S.init);
+
 	bar.result = S(5);
 	bar.result.test();
 	assert(bar.tag == bar.Tag.Success);
@@ -129,4 +165,10 @@ if(is(FailureType == enum))
 	Expected!(C, Failure) sus;
 	sus.result = c;
 	assert(sus.result.field == S(420));
+
+	immutable voidUser = Expected!(Failure)(true);
+	assert(voidUser.tag == voidUser.Tag.Success);
+
+	immutable voidUser2 = Expected!(Failure)(false);
+	assert(voidUser2.tag == voidUser.Tag.Failure);
 }
